@@ -5,7 +5,7 @@ using QuantSA.Shared.Dates;
 using QuantSA.Shared.MarketObservables;
 using QuantSA.Shared.Primitives;
 
-// Testing
+// Testing 
 namespace QuantSA.Core.Products.Equity
 {
     public class EuropeanOption : Product
