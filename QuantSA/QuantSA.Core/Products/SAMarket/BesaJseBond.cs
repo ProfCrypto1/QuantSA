@@ -45,7 +45,8 @@ namespace QuantSA.Core.Products.SAMarket
                 throw new ArgumentException("couponMonth1 must relate to the first coupon in the year.");
             this.maturityDate = maturityDate;
             this.notional = notional;
-            this.annualCouponRate = annualCouponRate;
+            this.annualCouponRate = annualCouponRate; 
+
             this.couponMonth1 = couponMonth1;
             this.couponDay1 = couponDay1;
             this.couponMonth2 = couponMonth2;

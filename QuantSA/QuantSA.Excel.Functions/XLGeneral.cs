@@ -152,6 +152,9 @@ namespace QuantSA.ExcelFunctions
 
             return measures;
         }
+        
+
+        ///----------------------------------------------------------------------------------------------------------------------------
 
         [QuantSAExcelFunction(
             Description = "Create a Besa JSE Bond Forward.",
@@ -210,6 +213,89 @@ namespace QuantSA.ExcelFunctions
             var result = (double)bondforward.ForwardPrice(settleDate, ytm, repo).GetScalar(JSEBondForwardEx.Keys.ForwardPrice);
             return result;
         }
+
+
+
+
+
+        ///----------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+        [QuantSAExcelFunction(
+            Description = "Create a Besa JSE Bond Future.",
+            Name = "QSA.CreateBesaJSEBondFuture",
+            HasGeneratedVersion = true,
+            ExampleSheet = "BesaJSEBondFuture.xlsx",
+            Category = "QSA.General",
+            IsHidden = false,
+            HelpTopic = "")]
+        public static JSEBondFuture CreateBesaJseBondFuture(
+            [ExcelArgument(Description = "The maturity date of the bond.")]
+                    Date maturity,
+            [ExcelArgument(Description = "The forward date of the contract.")]
+                    Date forwardDate,
+            [ExcelArgument(Description = "The notional amount of the bond.")]
+                    double notional,
+            [ExcelArgument(Description = "The annual coupon rate of the bond.")]
+                    double annualCouponRate,
+            [ExcelArgument(Description = "The month the first bond coupon is paid.")]
+                    int couponMonth1,
+            [ExcelArgument(Description = "The day the first bond coupon is paid.")]
+                    int couponDay1,
+            [ExcelArgument(Description = "The month the second bond coupon is paid.")]
+                    int couponMonth2,
+            [ExcelArgument(Description = "The day the second bond coupon is paid.")]
+                    int couponDay2,
+            [ExcelArgument(Description = "The books close date days of the bond.")]
+                    int bookscloseDateDays,
+            [ExcelArgument(Description = "The currency of the cashflows.")]
+                    Currency currency)
+
+        {
+            return new JSEBondFuture(forwardDate, maturity, notional, annualCouponRate, couponMonth1, couponDay1, couponMonth2, couponDay2, bookscloseDateDays, new Calendar("ZA"), currency);
+        }
+
+        [QuantSAExcelFunction(
+            Description = "Returns the forward price of a Besa JSE Bond Future.",
+            Name = "QSA.BesaJseBondFuturePrice",
+            HasGeneratedVersion = true,
+            ExampleSheet = "BesaJSEBondFuture.xlsx",
+            Category = "QSA.General",
+            IsHidden = false,
+            HelpTopic = "")]
+
+        public static double BesaJseFuturePrice(
+            [ExcelArgument(Description = "The underlying bond.")]
+                    JSEBondFuture bondforward,
+            [ExcelArgument(Description = "The settlement date of the bond.")]
+                    Date settleDate,
+            [ExcelArgument(Description = "The yield to maturity of the bond.")]
+                    double ytm,
+            [ExcelArgument(Description = "The repo rate of the bond.")]
+                double repo)
+
+        {
+            var result = (double)bondforward.ForwardPrice(settleDate, ytm, repo).GetScalar(JSEBondFutureEx.Keys.ForwardPrice);
+            return result;
+        }
+
+
+
+
+
+
+        ///----------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
 
         [QuantSAExcelFunction(
             Description = "Create a Besa JSE Bond Option.",

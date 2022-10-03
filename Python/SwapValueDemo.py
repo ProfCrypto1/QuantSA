@@ -1,8 +1,8 @@
 import clr # pip install pythonnet
 
 clr.AddReference("System.Collections")
-clr.AddReference(r'C:\Dev\QuantSA\QuantSA\Valuation\bin\Debug\QuantSA.General.dll')
-clr.AddReference(r'C:\Dev\QuantSA\QuantSA\Valuation\bin\Debug\QuantSA.Valuation.dll')
+clr.AddReference(r"C:\Users\MohamedEl-Shahir\Desktop\QuantSA\QuantSA\QuantSA.Valuation\bin\Debug\netstandard2.0\QuantSA.Core.dll")
+clr.AddReference(r"C:\Users\MohamedEl-Shahir\Desktop\QuantSA\QuantSA\QuantSA.Valuation\bin\Debug\netstandard2.0\QuantSA.Valuation.dll")
 
 from System.Collections.Generic import List
 from QuantSA.General import *
