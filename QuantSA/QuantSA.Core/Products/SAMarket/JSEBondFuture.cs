@@ -39,6 +39,8 @@ namespace QuantSA.Core.Products.SAMarket
             if (forwardDate > maturityDate)
                 throw new ArgumentException("forward date must be before maturity date.");
 
+            //Maturity date is the maturity of the underlying bond while forward date is the futures contract forward date
+
             var bond = new BesaJseBond(maturityDate, notional, annualCouponRate, couponMonth1, couponDay1, 
                 couponMonth2, couponDay2, booksCloseDateDays, zaCalendar, ccy);
 

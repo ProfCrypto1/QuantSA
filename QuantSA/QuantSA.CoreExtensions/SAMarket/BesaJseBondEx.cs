@@ -155,22 +155,9 @@ namespace QuantSA.CoreExtensions.SAMarket
             var t0 = bond.GetLastCouponDateOnOrBefore(settleDate);
 
             var t1 = bond.GetNextCouponDate(t0);
-<<<<<<< Updated upstream
             var tradingWithNextCoupon = t1 - settleDate > bond.booksCloseDateDays;
             var d = tradingWithNextCoupon ? settleDate - t0 : settleDate - t1;
 
-=======
-
-            var n = (int) Math.Round((bond.maturityDate - t1) / 182.625);
-
-            var tradingWithNextCoupon = t1 - settleDate > bond.booksCloseDateDays;
-            var d = tradingWithNextCoupon ? settleDate - t0 : settleDate - t1;  // true : false
-
-            var unroundedAccrued = N * bond.annualCouponRate * d / 365.0;
-            
-            var roundedAccrued = Math.Round(unroundedAccrued, 5);
-            
->>>>>>> Stashed changes
             var couponAtT1 = tradingWithNextCoupon ? typicalCoupon : 0.0;
             var v = 1 / (1 + ytm / 2);
 

@@ -12,6 +12,9 @@ namespace QuantSA.CoreExtensions.SAMarket
         // Get coupon dates for books close dates that lie between settlement date and forward date
         private static List<Date> GetCouponDates(this BesaJseBond bond, Date settleDate, Date forwardDate)
         {
+
+            // SettleDate is the date the first settlement date of the future ( the date the first leg is initiated)
+
             var BooksCloseDates = new List<Date> ();
             var CouponDates = new List<Date>();
 
@@ -53,13 +56,14 @@ namespace QuantSA.CoreExtensions.SAMarket
             var N = 100.0;
             var couponamount = N * bondfuture.underlyingBond.annualCouponRate / 2;
             var forwardDate = bondfuture.forwardDate;
-
+            
+            Calendar zaCalendar = new Calendar("ZAR");
             // Settlement date here refers to the date of the first leg?
 
             if (settleDate > forwardDate)
                 throw new ArgumentException("settlement date must be before forward date.");
 
-            if (CheckValidSettle( settleDate) == false)
+            if (CheckValidSettle( settleDate, zaCalendar) == false)
                 throw new ArgumentException("settlement date is not a valid settlement date.");
 
 
@@ -117,10 +121,94 @@ namespace QuantSA.CoreExtensions.SAMarket
         }
 
 
-        /// Method to check if future settles on first business Thursday of February, May, August and November
-        private static bool CheckValidSettle(Date settleDate)
+
+        public static ResultStore PVFuturePrice(this JSEBondFuture bondfuture, double strike ,Date settleDate, double ytm, double repo)
         {
-            Calendar cal = new Calendar("ZAR");
+            var N = 100.0;
+            var couponamount = N * bondfuture.underlyingBond.annualCouponRate / 2;
+            var forwardDate = bondfuture.forwardDate;
+
+            Calendar zaCalendar = new Calendar("ZAR");
+            // Settlement date here refers to the date of the first leg?
+
+            if (settleDate > forwardDate)
+                throw new ArgumentException("settlement date must be before forward date.");
+
+            if (CheckValidSettle(settleDate, zaCalendar) == false)
+                throw new ArgumentException("settlement date is not a valid settlement date.");
+
+
+            // get all-in price of underlying bond
+            var results = bondfuture.underlyingBond.GetSpotMeasures(settleDate, ytm);
+            var AIP = (double)results.GetScalar(BesaJseBondEx.Keys.RoundedAip);
+
+            
+            
+            // get PV of coupon Cash flows within the period
+
+                    // get coupon dates between settlement and forward date
+            var CouponDates = GetCouponDates(bondfuture.underlyingBond, settleDate, forwardDate);
+
+            var pvCoups = new List<double>();
+            if (CouponDates.Any())
+            {
+                foreach (var CouponDate in CouponDates)
+                {
+                    double pvcoup = couponamount * 1 / (1 + repo * (CouponDate - settleDate) / 365);
+
+                    pvCoups.Add(pvcoup);
+                }
+            }
+            else
+            {
+                pvCoups.Add(0);
+            }
+
+
+
+            // Accrued interest at T
+
+            double AI = 0;
+
+            if (CouponDates.Any())
+            {
+                var lastCoup = CouponDates.Last();
+                var DT_del = forwardDate - lastCoup; 
+
+                AI = 2*couponamount*(DT_del/365);
+            }
+            else
+            {
+                var DT_del = forwardDate - settleDate;
+                AI = 2*couponamount * (DT_del / 365);
+            }
+
+            // calculate adjusted Forward Price
+            var dt = (double)(forwardDate - settleDate) / 365;
+
+
+            var coupSum = pvCoups.Sum();
+
+            var adjForward = (AIP - coupSum) * (1 +repo*dt) -AI;
+
+            var PVFuturePrice = (adjForward - strike)*(1/ (1 + repo * dt));
+
+            var AdjustedForwardPrice = adjForward;
+
+            var resultStore = new ResultStore();
+            resultStore.Add(Keys.ForwardPrice, AdjustedForwardPrice);
+            resultStore.Add(Keys.PVFuturePrice, PVFuturePrice);
+            return resultStore;
+        }
+
+
+
+
+
+        /// Method to check if future settles on first business Thursday of February, May, August and November
+        private static bool CheckValidSettle(Date settleDate, Calendar cal)
+        {
+            
             if ((cal.IsBusinessDay(settleDate) == true & settleDate.DayOfWeek() == DayOfWeek.Tuesday) | (cal.IsBusinessDay(settleDate) == true & settleDate.DayOfWeek() == DayOfWeek.Thursday))
             { 
                 return true;
@@ -132,6 +220,7 @@ namespace QuantSA.CoreExtensions.SAMarket
         public static class Keys
         {
             public const string ForwardPrice = "AdjustedForwardPrice";
+            public const string PVFuturePrice = "PVFuturePrice";
         }
     }
 }
